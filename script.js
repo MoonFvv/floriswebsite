@@ -3,14 +3,27 @@ const MONOLITH_SPACING = 25;
 const CAMERA_DISTANCE = 10;
 const SCROLL_COOLDOWN = 1800;
 
+// GEWIJZIGD: videoSrc bevat nu objecten met webm en mp4 paden voor maximale compatibiliteit
 const projects = [
-    { title: 'FLORIS VROEGH', category: 'VIDEOGRAPHER & WEB DESIGN HOBBYIST', videoSrc: 'Knockin on heavens door sky NR.webm' },
-    { title: 'ALEC JUNGERIUS', category: 'WEB DESIGN', videoSrc: 'alecwebsitehd.webm' },
-    { title: '3D RENDERS', category: 'MOTION DESIGN', videoSrc: 'Knockin on heavens door sky NR.webm' },
+    { 
+        title: 'FLORIS VROEGH', 
+        category: 'VIDEOGRAPHER & WEB DESIGN HOBBYIST', 
+        videoSrc: { webm: 'knockin.mp4', mp4: 'knockin.mp4' }
+    },
+    { 
+        title: 'ALEC JUNGERIUS', 
+        category: 'WEB DESIGN', 
+        videoSrc: { webm: 'alecwebsitehd.mov', mp4: 'alecwebsitehd.mov' }
+    },
+    { 
+        title: '3D RENDERS', 
+        category: 'MOTION DESIGN', 
+        videoSrc: { webm: 'knockin.mp4', mp4: 'knockin.mp4' }
+    },
     {
         title: 'ABOUT & CONTACT',
         category: 'Een creatieve developer met een passie voor immersive web experiences. Laten we samen iets bouwen. \n\n FlorisVroegh@icloud.com',
-        videoSrc: 'Knockin on heavens door sky NR.mov'
+        videoSrc: { webm: 'knockin.mp4', mp4: 'knockin.mp4' }
     }
 ];
 
@@ -105,9 +118,23 @@ class WebGLApp {
 
         projects.forEach((project, i) => {
             const video = document.createElement('video');
-            video.src = project.videoSrc;
-            video.muted = true; video.loop = true; video.playsInline = true;
+            video.muted = true; 
+            video.loop = true; 
+            video.playsInline = true;
             video.crossOrigin = 'anonymous';
+
+            // GEWIJZIGD: We voegen <source> elementen toe voor elk videoformaat
+            const sourceWebm = document.createElement('source');
+            sourceWebm.src = project.videoSrc.webm;
+            sourceWebm.type = 'video/webm';
+
+            const sourceMp4 = document.createElement('source');
+            sourceMp4.src = project.videoSrc.mp4;
+            sourceMp4.type = 'video/mp4';
+
+            video.appendChild(sourceWebm);
+            video.appendChild(sourceMp4);
+
             video.load();
             this.allVideos.push(video);
             
@@ -190,15 +217,14 @@ class WebGLApp {
         if (this.currentIndex >= 0 && !this.isAnimating) {
             const currentMonolith = this.monoliths[this.currentIndex];
             
-            // --- AANGEPASTE, MINDER INTENSE INTERACTIE ---
-            const parallaxX = this.mouse.x * 0.1; // Was 0.2
-            const parallaxY = -this.mouse.y * 0.1; // Was 0.2
+            const parallaxX = this.mouse.x * 0.1;
+            const parallaxY = -this.mouse.y * 0.1;
             
             this.camera.position.x += (parallaxX - this.camera.position.x) * 0.05;
             this.camera.position.y += (parallaxY - this.camera.position.y) * 0.05;
 
-            currentMonolith.rotation.y += ((-this.mouse.x * 0.05) - currentMonolith.rotation.y) * 0.05; // Was 0.1
-            currentMonolith.rotation.x += ((-this.mouse.y * 0.05) - currentMonolith.rotation.x) * 0.05; // Was 0.1
+            currentMonolith.rotation.y += ((-this.mouse.x * 0.05) - currentMonolith.rotation.y) * 0.05;
+            currentMonolith.rotation.x += ((-this.mouse.y * 0.05) - currentMonolith.rotation.x) * 0.05;
             
             this.camera.lookAt(currentMonolith.position);
         }
